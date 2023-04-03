@@ -68,7 +68,17 @@ func buscarProducto(c *gin.Context) {
 
 func guardar() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req Producto
+
+		type request struct {
+			Name         string  `json:"name"`
+			Quantity     int     `json:"quantity"`
+			Code_value   int     `json:"code_value" `
+			Is_published bool    `json:"is_published"`
+			Expiration   string  `json:"expiration" `
+			Price        float64 `json:"price"`
+		}
+
+		var req request
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(404, gin.H{
 				"error": "parametros no validos",
@@ -94,7 +104,6 @@ func guardar() gin.HandlerFunc {
 		}
 
 		//validar fecha
-		// parse string date to golang time
 		re := regexp.MustCompile("^[0-3]?[0-9][/][0-3]?[0-9][/]([0-9]{2})?[0-9]{2}$")
 		//_, err := time.Parse("01/02/2006", req.Expiration)
 		if !re.MatchString(req.Expiration) {
@@ -103,8 +112,19 @@ func guardar() gin.HandlerFunc {
 			})
 			return
 		}
-		req.ID = len(sliceProdcuctos) + 1
-		sliceProdcuctos = append(sliceProdcuctos, req)
+
+		newProduct := Producto{
+			ID:           len(sliceProdcuctos) + 1,
+			Name:         req.Name,
+			Quantity:     req.Quantity,
+			Code_value:   req.Code_value,
+			Is_published: req.Is_published,
+			Expiration:   req.Expiration,
+			Price:        req.Price,
+		}
+
+		//req.ID = len(sliceProdcuctos) + 1
+		sliceProdcuctos = append(sliceProdcuctos, newProduct)
 		ctx.JSON(200, gin.H{
 			"ok":       "producto añadido correctamente",
 			"producto": req,
