@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -15,7 +14,7 @@ import (
 func main() {
 
 	//Variables de entorno
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 
 	if err != nil {
 
@@ -23,13 +22,9 @@ func main() {
 
 	}
 
-	usuario := os.Getenv("MY_USER")
+	/* 	usuario := os.Getenv("MY_USER")
 
-	password := os.Getenv("MY_PASS")
-
-	println("Usuario sacado de variables de Entorno: ", usuario)
-
-	println("Password sacado de variables de Entorno: ", password)
+	   	password := os.Getenv("MY_PASS") */
 
 	// Crea un router con gin
 	router := gin.Default()
@@ -62,10 +57,10 @@ func main() {
 	router.PATCH("/products/:id", handler.Patch())
 	router.DELETE("/products/:id", handler.Delete())
 
-	pr := router.Group("/products")
+	pr := router.Group("/products/")
 
 	//Ruta /products/search
-	pr.GET("/", handler.FiltrarPorPrecio())
+	//pr.GET("/", handler.FiltrarPorPrecio())
 	//Guardar producto
 	pr.POST("/", handler.Save())
 

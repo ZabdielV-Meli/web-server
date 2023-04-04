@@ -54,7 +54,7 @@ func (s DefaultService) BuscarPorId(id int) (product domain.Producto, err error)
 
 // Obtener DB
 func (s DefaultService) GetAll() (products []domain.Producto, err error) {
-	products, err = s.GetAll()
+	products, err = s.Repository.GetAll()
 
 	return
 }

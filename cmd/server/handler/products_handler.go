@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"strconv"
 
@@ -21,9 +22,28 @@ type ProductHandler struct {
 	Service products.Service
 }
 
+func (ph ProductHandler) ValidarToken(token string) (err error) {
+	tokenEnv := os.Getenv("TOKEN")
+	fmt.Println("tokens: ", tokenEnv, token)
+	if token != tokenEnv {
+		err = errors.New("Token invalido")
+	}
+
+	return
+}
+
 func (ph ProductHandler) Save() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
+
+		header := ctx.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			ctx.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 
 		//obtener la peticion y validarla
 		var req CreateProductRequest
@@ -46,7 +66,7 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 
 		productToCreate := req.ToDomain()
 		//Crear producto
-		err := ph.Service.Save(&productToCreate)
+		err = ph.Service.Save(&productToCreate)
 
 		if err != nil {
 			ctx.JSON(200, gin.H{
@@ -72,7 +92,18 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 func (ph ProductHandler) Update() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
+
 		// request
+
+		header := ctx.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			ctx.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		//castear de string a int
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
@@ -133,6 +164,15 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
+		header := ctx.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			ctx.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		//castear de string a int
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
@@ -185,6 +225,15 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
+		header := c.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			c.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		sliceProdcuctos, err := ph.Service.GetAll()
 		if err != nil {
 			c.JSON(200, gin.H{
@@ -203,6 +252,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 func (ph ProductHandler) FiltrarPorPrecio() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+
 		//castear de string a int
 		priceGt, _ := strconv.ParseFloat(c.Query("priceGt"), 64)
 
@@ -224,7 +274,14 @@ func (ph ProductHandler) FiltrarPorPrecio() gin.HandlerFunc {
 func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-
+		header := c.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			c.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 		//castear de string a int
 		id, _ := strconv.Atoi(c.Param("id"))
 
@@ -246,12 +303,20 @@ func (ph ProductHandler) Delete() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		// request
+		header := c.GetHeader("TOKEN")
+		err := ph.ValidarToken(header)
+		if err != nil {
+			c.JSON(200, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 		//castear de string a int
 		id, _ := strconv.Atoi(c.Param("id"))
 
 		//Buscar por id
 		// process
-		err := ph.Service.Delete(id)
+		err = ph.Service.Delete(id)
 		if err != nil {
 			c.JSON(404, gin.H{
 				"message": err.Error(),
