@@ -39,7 +39,7 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 		header := ctx.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			ctx.JSON(200, gin.H{
+			ctx.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -98,7 +98,7 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 		header := ctx.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			ctx.JSON(200, gin.H{
+			ctx.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -167,7 +167,7 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 		header := ctx.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			ctx.JSON(200, gin.H{
+			ctx.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -228,7 +228,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 		header := c.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			c.JSON(200, gin.H{
+			c.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -277,7 +277,7 @@ func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 		header := c.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			c.JSON(200, gin.H{
+			c.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -306,7 +306,7 @@ func (ph ProductHandler) Delete() gin.HandlerFunc {
 		header := c.GetHeader("TOKEN")
 		err := ph.ValidarToken(header)
 		if err != nil {
-			c.JSON(200, gin.H{
+			c.JSON(401, gin.H{
 				"error": err.Error(),
 			})
 			return
