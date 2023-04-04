@@ -7,4 +7,6 @@ type Service interface {
 	GetAll() ([]domain.Producto, error)
 	FiltrarPorPrecio(precio float64) ([]domain.Producto, error)
 	BuscarPorId(id int) (product domain.Producto, err error)
+	Update(product *domain.Producto) (pr domain.Producto, err error)
+	Delete(id int) error
 }
