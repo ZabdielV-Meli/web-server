@@ -14,14 +14,14 @@ var (
 	ErrprodcutNotFound = errors.New("product not found")
 )
 
-type jsonData struct {
+type JsonData struct {
 	data []domain.Producto
 }
 
 // Inicializa los productos a un slice
-func (repository *jsonData) InicializarBase() {
+func (repository *JsonData) InicializarBase() {
 	//leer el archivo JSON
-	arrayBites, err := os.ReadFile("../../products.json")
+	arrayBites, err := os.ReadFile("../products.json")
 	if err != nil {
 		fmt.Println("el archivo indicado no fue encontrado")
 		return
@@ -31,16 +31,28 @@ func (repository *jsonData) InicializarBase() {
 			return
 		}
 	}
+
+}
+
+// Guardar
+func (repository *JsonData) Save(product *domain.Producto) (err error) {
+	product.ID = len(repository.data) + 1
+	// save
+	repository.data = append(repository.data, *product)
+
+	return
 }
 
 // All
-func (repository *jsonData) GetAll() []domain.Producto {
+func (repository *JsonData) GetAll() []domain.Producto {
+
 	//leer el archivo JSON
+	//fmt.Println(repository.data)
 	return repository.data
 }
 
 // Buscar por id
-func (repository *jsonData) BuscarPorId(id int) (product domain.Producto, err error) {
+func (repository *JsonData) BuscarPorId(id int) (product domain.Producto, err error) {
 	//leer el archivo JSON
 	for _, valor := range repository.data {
 		if valor.ID == id {
@@ -51,7 +63,7 @@ func (repository *jsonData) BuscarPorId(id int) (product domain.Producto, err er
 	return product, ErrprodcutNotFound
 }
 
-func (repository *jsonData) Update(product *domain.Producto) (pr domain.Producto, err error) {
+func (repository *JsonData) Update(product *domain.Producto) (pr domain.Producto, err error) {
 	for i, valor := range repository.data {
 		if valor.ID == product.ID {
 			repository.data[i] = *product
@@ -61,7 +73,7 @@ func (repository *jsonData) Update(product *domain.Producto) (pr domain.Producto
 	return pr, ErrprodcutNotFound
 }
 
-func (repository *jsonData) Delete(id int) (err error) {
+func (repository *JsonData) Delete(id int) (err error) {
 
 	for i, m := range repository.data {
 		if m.ID == id {

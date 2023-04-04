@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zabdielv/gin-exercises/internal/products"
+	"github.com/zabdielv/gin-exercises/pkg/web"
 )
 
 var (
@@ -75,9 +76,15 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(200, gin.H{
+		/* 		gin.H{
 			"ok":       "producto añadido correctamente",
 			"producto": productToCreate,
+		} */
+		ctx.JSON(200, web.SuccessfulResponse{
+			Data: CreateProductResponse{
+				Estado: "producto añadido correctamente",
+				Name:   productToCreate.Name,
+			},
 		})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
@@ -146,10 +153,19 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(200, gin.H{
+		/* 		gin.H{
 			"ok":       "producto actualizado correctamente",
 			"producto": productUpdated,
-		})
+		} */
+
+		ctx.JSON(200,
+			web.SuccessfulResponse{
+				Data: CreateProductResponse{
+					Estado: "producto añadido correctamente",
+					Name:   productUpdated.Name,
+				},
+			})
+
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
 			"ok":       "producto añadido correctamente",
@@ -206,10 +222,18 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(200, gin.H{
+		/* 		ctx.JSON(200, gin.H{
 			"ok":       "producto actualizado correctamente",
 			"producto": productUpdated,
-		})
+		}) */
+
+		ctx.JSON(200,
+			web.SuccessfulResponse{
+				Data: CreateProductResponse{
+					Estado: "producto añadido correctamente",
+					Name:   productUpdated.Name,
+				},
+			})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
 			"ok":       "producto añadido correctamente",
@@ -242,7 +266,15 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(200, sliceProdcuctos)
+		/* 	c.JSON(200, sliceProdcuctos) */
+
+		c.JSON(200,
+			web.SuccessfulResponse{
+				Data: CreateProductResponse{
+					Estado: "Datos obtenidos",
+					Name:   sliceProdcuctos,
+				},
+			})
 
 	}
 
@@ -291,9 +323,18 @@ func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 			c.JSON(404, gin.H{
 				"message": err.Error(),
 			})
-		} else {
-			c.JSON(200, producto)
 		}
+
+		/* 	c.JSON(200, producto) */
+
+		c.JSON(200,
+			web.SuccessfulResponse{
+				Data: CreateProductResponse{
+					Estado: "Prodcuto obtenido",
+					Name:   producto,
+				},
+			})
+
 	}
 
 }
@@ -325,6 +366,7 @@ func (ph ProductHandler) Delete() gin.HandlerFunc {
 
 		// response
 		c.Header("Location", fmt.Sprintf("/movies/%d", id))
+
 		c.JSON(http.StatusNoContent, nil)
 
 	}

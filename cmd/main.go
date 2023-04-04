@@ -9,6 +9,7 @@ import (
 
 	handlers "github.com/zabdielv/gin-exercises/cmd/server/handler"
 	"github.com/zabdielv/gin-exercises/internal/products"
+	"github.com/zabdielv/gin-exercises/pkg/store"
 )
 
 func main() {
@@ -22,18 +23,19 @@ func main() {
 
 	}
 
-	/* 	usuario := os.Getenv("MY_USER")
-
-	   	password := os.Getenv("MY_PASS") */
-
 	// Crea un router con gin
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	//Iniciazilar BD
+	data := store.JsonData{}
+	data.InicializarBase()
+
 	//Create repository
-	repository := products.Local_repository{}
-	repository.InicializarBase()
+	repository := products.Local_repository{
+		BD: data,
+	}
 
 	//Create service
 	service := products.DefaultService{

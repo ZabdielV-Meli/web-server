@@ -1,9 +1,11 @@
-package rest
+package web
 
 type SuccessfulResponse struct {
 	Data any `json:"data"`
 }
 
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Status  int    `json:"status"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
