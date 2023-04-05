@@ -51,18 +51,18 @@ func main() {
 	})
 
 	//Ruta /products
-	router.GET("/products", handler.GetAll())
+	//router.GET("/products", handler.GetAll())
 
+	router.GET("/products/consumer_price", handler.ListaProductos())
 	//Ruta /products/:id
-	router.GET("/products/:id", handler.BuscarPorId())
+	//router.GET("/products/:id", handler.BuscarPorId())
 	router.PUT("/products/:id", handler.Update())
 	router.PATCH("/products/:id", handler.Patch())
 	router.DELETE("/products/:id", handler.Delete())
 
 	pr := router.Group("/products/")
 
-	//Ruta /products/search
-	//pr.GET("/", handler.FiltrarPorPrecio())
+	pr.GET("/", handler.GetAll())
 	//Guardar producto
 	pr.POST("/", handler.Save())
 

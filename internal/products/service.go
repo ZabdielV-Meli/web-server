@@ -9,4 +9,5 @@ type Service interface {
 	BuscarPorId(id int) (product domain.Producto, err error)
 	Update(product *domain.Producto) (pr domain.Producto, err error)
 	Delete(id int) error
+	ListaProductos(sliceIds []int) (sliceProductos *[]domain.Producto, totalImpuesto float64, err error)
 }

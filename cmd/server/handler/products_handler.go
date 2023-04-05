@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"strconv"
 
@@ -83,7 +84,7 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 		ctx.JSON(200, web.SuccessfulResponse{
 			Data: CreateProductResponse{
 				Estado: "producto añadido correctamente",
-				Name:   productToCreate.Name,
+				Datos:  productToCreate.Name,
 			},
 		})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
@@ -162,7 +163,7 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "producto añadido correctamente",
-					Name:   productUpdated.Name,
+					Datos:  productUpdated.Name,
 				},
 			})
 
@@ -231,7 +232,7 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "producto añadido correctamente",
-					Name:   productUpdated.Name,
+					Datos:  productUpdated.Name,
 				},
 			})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
@@ -258,6 +259,29 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
+		//Si existe un query
+		valorQuery := c.Query("priceGt")
+
+		if valorQuery != "" {
+			//castear de string a int
+			priceGt, _ := strconv.ParseFloat(valorQuery, 64)
+			sliceProdcuctos, err := ph.Service.FiltrarPorPrecio(priceGt)
+			if err != nil {
+				c.JSON(200, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+
+			//c.JSON(200, sliceProdcuctos)
+			c.JSON(200,
+				web.SuccessfulResponse{
+					Data: CreateProductResponse{
+						Estado: fmt.Sprintf("productos mayores a: %.1f", priceGt),
+						Datos:  sliceProdcuctos,
+					},
+				})
+		}
 		sliceProdcuctos, err := ph.Service.GetAll()
 		if err != nil {
 			c.JSON(200, gin.H{
@@ -272,7 +296,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "Datos obtenidos",
-					Name:   sliceProdcuctos,
+					Datos:  sliceProdcuctos,
 				},
 			})
 
@@ -280,15 +304,42 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 
 }
 
-// Filtrar por precio
-func (ph ProductHandler) FiltrarPorPrecio() gin.HandlerFunc {
+// lista
+func (ph ProductHandler) ListaProductos() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
 		//castear de string a int
-		priceGt, _ := strconv.ParseFloat(c.Query("priceGt"), 64)
+		//Si existe un query
+		valorQuery := c.Query("list")
 
-		sliceProdcuctos, err := ph.Service.FiltrarPorPrecio(priceGt)
+		//manejar error
+		if valorQuery == "" || len(valorQuery) < 3 {
+
+			c.JSON(201, gin.H{
+				"error": "mal query",
+			})
+			return
+
+		}
+
+		valorQuery = valorQuery[1 : len(valorQuery)-1]
+		arrayQuery := strings.Split(valorQuery, ",")
+
+		//Convertir cada character a un int y pasarlo a un slice
+		temporalSlice := []int{}
+		for _, valor := range arrayQuery {
+			id, err := strconv.Atoi(valor)
+			if err != nil {
+				c.JSON(201, gin.H{
+					"error": "mal query",
+				})
+				return
+			}
+			temporalSlice = append(temporalSlice, id)
+		}
+
+		sliceProdcuctos, total, err := ph.Service.ListaProductos(temporalSlice)
 		if err != nil {
 			c.JSON(200, gin.H{
 				"error": err.Error(),
@@ -296,8 +347,14 @@ func (ph ProductHandler) FiltrarPorPrecio() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(200, sliceProdcuctos)
-
+		//c.JSON(200, sliceProdcuctos)
+		c.JSON(200,
+			web.SuccessfulResponse{
+				Data: CreateListResponse{
+					Productos: sliceProdcuctos,
+					Total:     total,
+				},
+			})
 	}
 
 }
@@ -331,7 +388,7 @@ func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "Prodcuto obtenido",
-					Name:   producto,
+					Datos:  producto,
 				},
 			})
 

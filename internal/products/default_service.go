@@ -75,6 +75,25 @@ func (s DefaultService) FiltrarPorPrecio(precio float64) ([]domain.Producto, err
 	return sliceQuery, nil
 }
 
+func (s DefaultService) ListaProductos(sliceIds []int) (sliceProductos *[]domain.Producto, totalImpuesto float64, err error) {
+	sliceTemporal := []domain.Producto{}
+
+	for _, valor := range sliceIds {
+		producto, err := s.BuscarPorId(valor)
+		if err != nil || producto.Is_published == false {
+			return sliceProductos, 0.0, errors.New("producto/s no publicado")
+		}
+		sliceTemporal = append(sliceTemporal, producto)
+	}
+
+	//calcular imouesto
+	for _, valor := range sliceTemporal {
+		totalImpuesto += valor.Price
+	}
+
+	return &sliceTemporal, totalImpuesto, nil
+}
+
 func (s DefaultService) Delete(id int) error {
 
 	return s.Repository.Delete(id)
