@@ -81,10 +81,10 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 			"ok":       "producto añadido correctamente",
 			"producto": productToCreate,
 		} */
-		ctx.JSON(200, web.SuccessfulResponse{
+		ctx.JSON(201, web.SuccessfulResponse{
 			Data: CreateProductResponse{
 				Estado: "producto añadido correctamente",
-				Datos:  productToCreate.Name,
+				Datos:  productToCreate,
 			},
 		})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
@@ -163,7 +163,7 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "producto añadido correctamente",
-					Datos:  productUpdated.Name,
+					Datos:  productUpdated,
 				},
 			})
 
@@ -232,7 +232,7 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 			web.SuccessfulResponse{
 				Data: CreateProductResponse{
 					Estado: "producto añadido correctamente",
-					Datos:  productUpdated.Name,
+					Datos:  productUpdated,
 				},
 			})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
@@ -276,7 +276,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 			//c.JSON(200, sliceProdcuctos)
 			c.JSON(200,
 				web.SuccessfulResponse{
-					Data: CreateProductResponse{
+					Data: CreateProductsResponse{
 						Estado: fmt.Sprintf("productos mayores a: %.1f", priceGt),
 						Datos:  sliceProdcuctos,
 					},
@@ -294,7 +294,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 
 		c.JSON(200,
 			web.SuccessfulResponse{
-				Data: CreateProductResponse{
+				Data: CreateProductsResponse{
 					Estado: "Datos obtenidos",
 					Datos:  sliceProdcuctos,
 				},
@@ -351,7 +351,7 @@ func (ph ProductHandler) ListaProductos() gin.HandlerFunc {
 		c.JSON(200,
 			web.SuccessfulResponse{
 				Data: CreateListResponse{
-					Productos: sliceProdcuctos,
+					Productos: *sliceProdcuctos,
 					Total:     total,
 				},
 			})
@@ -372,14 +372,21 @@ func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 			return
 		}
 		//castear de string a int
-		id, _ := strconv.Atoi(c.Param("id"))
+		id, err := strconv.Atoi(c.Param("id"))
 
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": errors.New("Bad request"),
+			})
+			return
+		}
 		//Buscar por id
 		producto, err := ph.Service.BuscarPorId(id)
 		if err != nil {
 			c.JSON(404, gin.H{
 				"message": err.Error(),
 			})
+			return
 		}
 
 		/* 	c.JSON(200, producto) */

@@ -19,9 +19,9 @@ type JsonData struct {
 }
 
 // Inicializa los productos a un slice
-func (repository *JsonData) InicializarBase() {
+func (repository *JsonData) InicializarBase(ruta string) {
 	//leer el archivo JSON
-	arrayBites, err := os.ReadFile("../products.json")
+	arrayBites, err := os.ReadFile(ruta)
 	if err != nil {
 		fmt.Println("el archivo indicado no fue encontrado")
 		return

@@ -29,12 +29,12 @@ func main() {
 	router.Use(gin.Recovery())
 
 	//Iniciazilar BD
-	data := store.JsonData{}
-	data.InicializarBase()
+	db := store.JsonData{}
+	db.InicializarBase("../products.json")
 
 	//Create repository
 	repository := products.Local_repository{
-		BD: data,
+		BD: db,
 	}
 
 	//Create service
@@ -50,12 +50,9 @@ func main() {
 		c.String(200, "pong")
 	})
 
-	//Ruta /products
-	//router.GET("/products", handler.GetAll())
-
-	router.GET("/products/consumer_price", handler.ListaProductos())
+	router.GET("/products/consumer_price/", handler.ListaProductos())
 	//Ruta /products/:id
-	//router.GET("/products/:id", handler.BuscarPorId())
+	router.GET("/products/:id", handler.BuscarPorId())
 	router.PUT("/products/:id", handler.Update())
 	router.PATCH("/products/:id", handler.Patch())
 	router.DELETE("/products/:id", handler.Delete())

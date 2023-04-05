@@ -31,7 +31,7 @@ func (data *Local_repository) Save(product *domain.Producto) (err error) {
 
 func (data *Local_repository) BuscarPorId(id int) (product domain.Producto, err error) {
 
-	product, ErrprodcutNotFound = data.BD.BuscarPorId(id)
+	product, err = data.BD.BuscarPorId(id)
 
 	return
 
