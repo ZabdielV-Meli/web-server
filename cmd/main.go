@@ -5,13 +5,37 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+	_ "github.com/zabdielv/gin-exercises/docs"
 
+	// swagger embed files
+
+	"github.com/joho/godotenv"
 	handlers "github.com/zabdielv/gin-exercises/cmd/server/handler"
 	"github.com/zabdielv/gin-exercises/internal/products"
 	"github.com/zabdielv/gin-exercises/pkg/store"
 )
 
+// @title           Products API
+// @version         1.0
+// @description     APi example
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /products/
+
+// @securityDefinitions.basic  BasicAuth
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 
 	//Variables de entorno
@@ -63,6 +87,7 @@ func main() {
 	//Guardar producto
 	pr.POST("/", handler.Save())
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	// Corremos nuestro servidor sobre el puerto 8080
 	// run
 

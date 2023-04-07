@@ -3,8 +3,6 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"os"
 	"strings"
 
 	"strconv"
@@ -24,28 +22,21 @@ type ProductHandler struct {
 	Service products.Service
 }
 
-func (ph ProductHandler) ValidarToken(token string) (err error) {
-	tokenEnv := os.Getenv("TOKEN")
-	fmt.Println("tokens: ", tokenEnv, token)
-	if token != tokenEnv {
-		err = errors.New("Token invalido")
-	}
-
-	return
-}
-
+// funcion que trae todos los products
+// comentario propio que no afecta a la documentacion
+// @Summary Save a product
+// @Tags Products
+// @Description Save a product through body
+// @Produce json
+// @Accept			json
+// @Param			product	body		handlers.CreateProductRequest	true	"Some product"
+// @Param token header string true "TOKEN"
+// @Sucess 200 {object}	web.SuccessfulResponse
+// @Failure 404
+// @Router /products/ [POST]
 func (ph ProductHandler) Save() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
-
-		header := ctx.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			ctx.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
 		//obtener la peticion y validarla
 		var req CreateProductRequest
@@ -68,7 +59,7 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 
 		productToCreate := req.ToDomain()
 		//Crear producto
-		err = ph.Service.Save(&productToCreate)
+		err := ph.Service.Save(&productToCreate)
 
 		if err != nil {
 			ctx.JSON(200, gin.H{
@@ -81,12 +72,12 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 			"ok":       "producto añadido correctamente",
 			"producto": productToCreate,
 		} */
-		ctx.JSON(201, web.SuccessfulResponse{
-			Data: CreateProductResponse{
-				Estado: "producto añadido correctamente",
-				Datos:  productToCreate,
-			},
+		web.Success(ctx, 201, CreateProductResponse{
+			ID:    productToCreate.ID,
+			Name:  productToCreate.Name,
+			Price: productToCreate.Price,
 		})
+		//web.Success(ctx, 201, productToCreate)
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
 			"ok":       "producto añadido correctamente",
@@ -97,20 +88,24 @@ func (ph ProductHandler) Save() gin.HandlerFunc {
 	}
 }
 
+// funcion que trae todos los products
+// comentario propio que no afecta a la documentacion
+// @Summary Update a product
+// @Tags Products
+// @Description Update a product through body
+// @Produce json
+// @Accept			json
+// @Param id path string true "Please give ID"
+// @Param product body handlers.CreateProductRequest	true	"Some product"
+// @Param token header string true "TOKEN"
+// @Sucess 200 {object}	web.SuccessfulResponse
+// @Failure 404
+// @Router /products/{id} [PUT]
 func (ph ProductHandler) Update() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
 		// request
-
-		header := ctx.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			ctx.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
 		//castear de string a int
 		id, _ := strconv.Atoi(ctx.Param("id"))
@@ -159,13 +154,11 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 			"producto": productUpdated,
 		} */
 
-		ctx.JSON(200,
-			web.SuccessfulResponse{
-				Data: CreateProductResponse{
-					Estado: "producto añadido correctamente",
-					Datos:  productUpdated,
-				},
-			})
+		web.Success(ctx, 200, CreateProductResponse{
+			ID:    productUpdated.ID,
+			Name:  productUpdated.Name,
+			Price: productToUpdate.Price,
+		})
 
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
@@ -177,18 +170,20 @@ func (ph ProductHandler) Update() gin.HandlerFunc {
 	}
 }
 
+// @Summary Patch a product
+// @Tags Products
+// @Description Update some atributes of Model
+// @Produce json
+// @Accept			json
+// @Param id path string true "Please give ID"
+// @Param product body handlers.CreateProductRequest	true	"Some product"
+// @Param token header string true "TOKEN"
+// @Sucess 200 {object}	web.SuccessfulResponse
+// @Failure 404
+// @Router /products/{id} [PUT]
 func (ph ProductHandler) Patch() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
-
-		header := ctx.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			ctx.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
 		//castear de string a int
 		id, _ := strconv.Atoi(ctx.Param("id"))
@@ -212,6 +207,7 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 			return
 		}
 
+		//redundante ?
 		producto.ID = id
 		//Actualizar producto
 		productUpdated, err := ph.Service.Update(&producto)
@@ -228,13 +224,11 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 			"producto": productUpdated,
 		}) */
 
-		ctx.JSON(200,
-			web.SuccessfulResponse{
-				Data: CreateProductResponse{
-					Estado: "producto añadido correctamente",
-					Datos:  productUpdated,
-				},
-			})
+		web.Success(ctx, 200, CreateProductResponse{
+			ID:    productUpdated.ID,
+			Name:  productUpdated.Name,
+			Price: productUpdated.Price,
+		})
 		//Si se quiere ocultar datos personales se crea un struct con respuesta personalizada
 		/* 		ctx.JSON(200, gin.H{
 			"ok":       "producto añadido correctamente",
@@ -245,19 +239,20 @@ func (ph ProductHandler) Patch() gin.HandlerFunc {
 	}
 }
 
+// funcion que trae todos los products
+// comentario propio que no afecta a la documentacion
+// @Summary List Products
+// @Tags Products
+// @Description Gets all Products without filter
+// @Produce json
+// @Param token header string true "TOKEN"
+// @Sucess 200 {object}	web.SuccessfulResponse
+// @Failure 400
+// @Router /products/ [GET]
 // Obtener productos
 func (ph ProductHandler) GetAll() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-
-		header := c.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
 		//Si existe un query
 		valorQuery := c.Query("priceGt")
@@ -274,13 +269,8 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 			}
 
 			//c.JSON(200, sliceProdcuctos)
-			c.JSON(200,
-				web.SuccessfulResponse{
-					Data: CreateProductsResponse{
-						Estado: fmt.Sprintf("productos mayores a: %.1f", priceGt),
-						Datos:  sliceProdcuctos,
-					},
-				})
+
+			web.Success(c, 200, sliceProdcuctos)
 		}
 		sliceProdcuctos, err := ph.Service.GetAll()
 		if err != nil {
@@ -292,14 +282,7 @@ func (ph ProductHandler) GetAll() gin.HandlerFunc {
 
 		/* 	c.JSON(200, sliceProdcuctos) */
 
-		c.JSON(200,
-			web.SuccessfulResponse{
-				Data: CreateProductsResponse{
-					Estado: "Datos obtenidos",
-					Datos:  sliceProdcuctos,
-				},
-			})
-
+		web.Success(c, 200, sliceProdcuctos)
 	}
 
 }
@@ -339,7 +322,7 @@ func (ph ProductHandler) ListaProductos() gin.HandlerFunc {
 			temporalSlice = append(temporalSlice, id)
 		}
 
-		sliceProdcuctos, total, err := ph.Service.ListaProductos(temporalSlice)
+		sliceProdcuctos, _, err := ph.Service.ListaProductos(temporalSlice)
 		if err != nil {
 			c.JSON(200, gin.H{
 				"error": err.Error(),
@@ -347,30 +330,25 @@ func (ph ProductHandler) ListaProductos() gin.HandlerFunc {
 			return
 		}
 
-		//c.JSON(200, sliceProdcuctos)
-		c.JSON(200,
-			web.SuccessfulResponse{
-				Data: CreateListResponse{
-					Productos: *sliceProdcuctos,
-					Total:     total,
-				},
-			})
+		web.Success(c, 200, *sliceProdcuctos)
 	}
 
 }
 
+// @Summary Find by ID a product
+// @Tags Products
+// @Description Find by ID a product
+// @Produce json
+// @Param id path string true "Please give ID"
+// @Param token header string true "TOKEN"
+// @Sucess 200 {object}	web.SuccessfulResponse
+// @Failure 404
+// @Router /products/{id} [GET]
 // Buscar por ID
 func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		header := c.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+
 		//castear de string a int
 		id, err := strconv.Atoi(c.Param("id"))
 
@@ -391,37 +369,36 @@ func (ph ProductHandler) BuscarPorId() gin.HandlerFunc {
 
 		/* 	c.JSON(200, producto) */
 
-		c.JSON(200,
-			web.SuccessfulResponse{
-				Data: CreateProductResponse{
-					Estado: "Prodcuto obtenido",
-					Datos:  producto,
-				},
-			})
-
+		web.Success(c, 200, CreateProductResponse{
+			ID:    producto.ID,
+			Name:  producto.Name,
+			Price: producto.Price,
+		})
 	}
 
 }
 
+// @Summary Delete by ID a product
+// @Tags Products
+// @Description Delete by ID a product
+// @Param id path string true "Please give ID"
+// @Param token header string true "TOKEN"
+// @Sucess 204 {object}
+// @Failure 404
+// @Router /products/{id} [delete]
+// Buscar por ID
 // Buscar por ID
 func (ph ProductHandler) Delete() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		// request
-		header := c.GetHeader("TOKEN")
-		err := ph.ValidarToken(header)
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+
 		//castear de string a int
 		id, _ := strconv.Atoi(c.Param("id"))
 
 		//Buscar por id
 		// process
-		err = ph.Service.Delete(id)
+		err := ph.Service.Delete(id)
 		if err != nil {
 			c.JSON(404, gin.H{
 				"message": err.Error(),
@@ -431,7 +408,7 @@ func (ph ProductHandler) Delete() gin.HandlerFunc {
 		// response
 		c.Header("Location", fmt.Sprintf("/movies/%d", id))
 
-		c.JSON(http.StatusNoContent, nil)
+		web.Success(c, 204, nil)
 
 	}
 

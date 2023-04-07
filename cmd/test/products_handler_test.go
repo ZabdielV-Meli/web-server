@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	handlers "github.com/zabdielv/gin-exercises/cmd/server/handler"
+	"github.com/zabdielv/gin-exercises/internal/domain"
 	"github.com/zabdielv/gin-exercises/internal/products"
 	"github.com/zabdielv/gin-exercises/pkg/store"
 	"github.com/zabdielv/gin-exercises/pkg/web"
@@ -83,7 +84,7 @@ func createRequestTest(method string, url string, body string) (*http.Request, *
 func Test_GetProducts_OK(t *testing.T) {
 
 	var objRes web.SuccessfulResponse
-	var productsResponse handlers.CreateProductsResponse
+	var objProduct []domain.Producto
 	// crear el Server y definir las Rutas
 	r := createServerForTestProductsHandler()
 	// crear Request del tipo GET y Response para obtener el resultado
@@ -98,10 +99,10 @@ func Test_GetProducts_OK(t *testing.T) {
 	//Convertir struct SuccessfulResponse.Data a bytes
 	producsResponseBytes, _ := json.Marshal(objRes.Data)
 	//Convertir bytes a CreateProductsResponse
-	json.Unmarshal(producsResponseBytes, &productsResponse)
+	json.Unmarshal(producsResponseBytes, &objProduct)
 
 	//t.Log(productsResponse.Datos)
-	assert.True(t, len(productsResponse.Datos) > 0)
+	assert.True(t, len(objProduct) > 0)
 }
 
 // GET /products/:id

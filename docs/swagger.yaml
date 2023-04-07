@@ -1,0 +1,149 @@
+basePath: /products/
+definitions:
+  handlers.CreateProductRequest:
+    properties:
+      code_value:
+        type: integer
+      expiration:
+        type: string
+      is_published:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: APi example
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Products API
+  version: "1.0"
+paths:
+  /products/:
+    get:
+      description: Gets all Products without filter
+      parameters:
+      - description: TOKEN
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+      summary: List Products
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: Save a product through body
+      parameters:
+      - description: Some product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateProductRequest'
+      - description: TOKEN
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "404":
+          description: Not Found
+      summary: Save a product
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      description: Delete by ID a product
+      parameters:
+      - description: Please give ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: TOKEN
+        in: header
+        name: token
+        required: true
+        type: string
+      responses:
+        "404":
+          description: Not Found
+      summary: Delete by ID a product
+      tags:
+      - Products
+    get:
+      description: Find by ID a product
+      parameters:
+      - description: Please give ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: TOKEN
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "404":
+          description: Not Found
+      summary: Find by ID a product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update some atributes of Model
+      parameters:
+      - description: Please give ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Some product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateProductRequest'
+      - description: TOKEN
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "404":
+          description: Not Found
+      summary: Patch a product
+      tags:
+      - Products
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
