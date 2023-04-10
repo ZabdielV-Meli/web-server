@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -40,13 +41,13 @@ func main() {
 
 	//Variables de entorno
 	err := godotenv.Load("../.env")
-
+	path, _ := os.Getwd()
 	if err != nil {
-		fmt.Println("GG")
+		fmt.Println("el path es: ", path)
 		log.Fatal("Error al intentar cargar archivo .env")
 
 	}
-
+	fmt.Println("el path es: ", path)
 	// Crea un router con gin
 	router := gin.Default()
 	router.Use(gin.Logger())
