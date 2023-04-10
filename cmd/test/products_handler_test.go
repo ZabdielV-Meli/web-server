@@ -101,7 +101,7 @@ func Test_GetProducts_OK(t *testing.T) {
 	//Convertir bytes a CreateProductsResponse
 	json.Unmarshal(producsResponseBytes, &objProduct)
 
-	//t.Log(productsResponse.Datos)
+	t.Log(objProduct)
 	assert.True(t, len(objProduct) > 0)
 }
 

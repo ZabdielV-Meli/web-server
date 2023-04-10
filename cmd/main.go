@@ -42,7 +42,7 @@ func main() {
 	err := godotenv.Load("../.env")
 
 	if err != nil {
-
+		fmt.Println("GG")
 		log.Fatal("Error al intentar cargar archivo .env")
 
 	}
